@@ -12,7 +12,7 @@ from skimage.metrics import structural_similarity as ssim
 from glob import glob
 import torch.nn.functional as F
 from measure import compute_PSNR, compute_SSIM
-
+import random
 from models.transunet import TransUNet
 from models.unet import Unet_34, Unet_50
 from models.res_swin import Res_Swin
@@ -22,6 +22,14 @@ from models.compare_models import Model1, Model2
 from models.red_cnn import RED_CNN
 
 img_size = (512, 512)
+
+def setup_seed(seed):
+     torch.manual_seed(seed)
+     torch.cuda.manual_seed_all(seed)
+     np.random.seed(seed)
+     random.seed(seed)
+     torch.backends.cudnn.deterministic = True
+setup_seed(0)
 
 class ct_dataset(Dataset):
     def __init__(self, mode, saved_path, test_patient, transform=None):
