@@ -4,6 +4,7 @@ from train import train
 def argparser():
     parser = argparse.ArgumentParser("Pytorch of Res_Swin")
     parser.add_argument('--epochs', help='the total episodes', type=int, default=11000)
+    parser.add_argument('--seed', help='random seed', type=int, default=0)
     parser.add_argument('--stop_epoch', help='the episodes of saving in test process', type=int, default=11000)
     parser.add_argument('--nepoch', help='the episodes of scheduler', type=int, default=2000)  # data 1: 1000 data 2: 500 data 3: 2000
     parser.add_argument('--warmup_epochs', help='warmup epochs', type=int, default=20)
