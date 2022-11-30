@@ -180,7 +180,7 @@ def train(args):
             scheduler.step()
         print("epoch:", epoch, "loss:", float(losses / len(train_dataset)))
         
-        if epoch % 50 == 0:
+        if epoch % args.interval == 0:
             with open(record_save+'/loss.txt','a') as f:
                 temp_loss = str(float(losses / len(train_dataset)))
                 f.write(temp_loss+'\n')
