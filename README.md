@@ -1,24 +1,14 @@
 # Res_Swin
 
-- models
+- models: Include all the models of experiments
 
-Include all the models of experiments
+- warmup_scheduler: Implement warmup schedueler
 
-- warmup_scheduler
+- main.py: Implementation file
 
-Implement warmup schedueler
+- train.py: Training pipline
 
-- main.py
-
-Implementation file
-
-- train.py
-
-Training pipline
-
-- measure.py
-
-Measurement function of PSNR and SSIM
+- measure.py: Measurement function of PSNR and SSIM
 
 - Running:
 ```
