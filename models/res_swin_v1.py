@@ -102,7 +102,7 @@ class DConv_5(nn.Module):
         return e5
 
 class Res_Swin_v1(nn.Module):
-    def __init__(self, img_size=512, hidden_dim=64,layers=(2, 2, 12, 2),heads=(3, 6, 12, 24),channels=1,head_dim=32,window_size=8, downscaling_factors=(2, 2, 2, 2),relative_pos_embedding=True):
+    def __init__(self, img_size=512, hidden_dim=64,layers=(2, 2, 6, 2),heads=(3, 6, 12, 24),channels=1,head_dim=32,window_size=8, downscaling_factors=(2, 2, 2, 2),relative_pos_embedding=True):
         super().__init__()
         self.layer0 = nn.Sequential(
             Conv_3(channels, hidden_dim, 7, 2, 3),
