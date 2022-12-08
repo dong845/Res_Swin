@@ -101,6 +101,7 @@ class DConv_5(nn.Module):
         e5 = e5+e3
         return e5
 
+# Single Branch Res_Swin
 class Res_Swin_v1(nn.Module):
     def __init__(self, img_size=512, hidden_dim=64,layers=(2, 2, 6, 2),heads=(3, 6, 12, 24),channels=1,head_dim=32,window_size=8, downscaling_factors=(2, 2, 2, 2),relative_pos_embedding=True):
         super().__init__()

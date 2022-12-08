@@ -4,6 +4,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 class GradualWarmupScheduler(_LRScheduler):
     """ Gradually warm-up(increasing) learning rate in optimizer.
+    Referred from https://github.com/ZhendongWang6/Uformer
     Args:
         optimizer (Optimizer): Wrapped optimizer.
         multiplier: target learning rate = base lr * multiplier if multiplier > 1.0. if multiplier = 1.0, lr starts from 0 and ends up with the base_lr.

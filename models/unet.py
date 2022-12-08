@@ -10,7 +10,7 @@ class Decoder(nn.Module):
         nn.Conv2d(middle_channels, out_channels, kernel_size=3, padding=1),
         nn.ReLU(inplace=True)
         )
-    #self.relu1 = nn.ReLU()
+
   def forward(self, x1, x2):
     x1 = self.up(x1)
     x1 = torch.cat((x1, x2), dim=1)

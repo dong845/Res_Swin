@@ -4,7 +4,7 @@ from swin import StageModule
 import torchvision
 from decode import Res_ViT_decode
 
-
+# Conv Block: Conv+BatchNorm+ReLU
 class Conv_3(nn.Module):
     def __init__(self, in_channels, out_channels, kernel, stride, padding, alpha=0.2):
         super(Conv_3, self).__init__()
@@ -17,6 +17,7 @@ class Conv_3(nn.Module):
     def forward(self, x):
         return self.conv3(x)
 
+# DConv Block: DConv+BatchNorm+ReLU
 class DConv(nn.Module):
     def __init__(self, in_channels, out_channels, kernel, stride, padding, dilation, alpha=0.2):
         super(DConv, self).__init__()
@@ -29,7 +30,7 @@ class DConv(nn.Module):
     def forward(self, x):
         return self.conv3(x)
 
-
+# Single Decoder Block
 class Decoder(nn.Module):
     def __init__(self, in_channels, middle_channels, out_channels, alpha=0.2):
         super(Decoder, self).__init__()
@@ -45,28 +46,7 @@ class Decoder(nn.Module):
         x1 = self.conv_relu(x1)
         return x1
 
-class Decoder_new(nn.Module):
-    def __init__(self, in_channels, middle_channels, out_channels, alpha=0.2):
-        super(Decoder_new, self).__init__()
-        self.up = nn.ConvTranspose2d(in_channels, out_channels, kernel_size=2, stride=2)
-        self.conv_relu = nn.Sequential(
-            nn.Conv2d(middle_channels, out_channels, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True)
-        )
-        self.conv_relu1 = nn.Sequential(
-            nn.Conv2d(middle_channels, out_channels, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True)
-        )
-
-    def forward(self, x1, x2, x3):
-        x1 = self.up(x1)
-        x1 = torch.cat((x1, x2), dim=1)
-        x1 = self.conv_relu(x1)
-        x1 = torch.cat((x1, x3), dim=1)
-        x1 = self.conv_relu1(x1)
-        return x1
-
-
+# auxiliary branch of swin transformer module, conv + layernorm
 class Channel_wise(nn.Module):
     def __init__(self, in_channels, out_channels, sizes):
         super().__init__()
@@ -79,7 +59,7 @@ class Channel_wise(nn.Module):
     def forward(self, x):
         return self.avg(x)
 
-
+# Conv+DConv+Conv
 class DConv_3(nn.Module):
     def __init__(self, channels, alpha=0.2):
         super().__init__()
@@ -99,7 +79,7 @@ class DConv_3(nn.Module):
         e3 = e3+e1
         return e3
 
-
+# Conv+Conv
 class DConv_2(nn.Module):
     def __init__(self, channels):
         super().__init__()
@@ -112,7 +92,7 @@ class DConv_2(nn.Module):
         e2=e2+x
         return e2
 
-
+# Conv+Dconv+Conv+Dconv+Conv
 class DConv_5(nn.Module):
     def __init__(self, channels, alpha=0.2):
         super().__init__()
@@ -142,7 +122,7 @@ class DConv_5(nn.Module):
         e5 = e5+e3
         return e5
 
-# ONLY SWIN
+# Swin Transformer module + original ResNet second part
 class Model1(nn.Module):
     def __init__(self, img_size=512, hidden_dim=64, layers=(2, 2, 6,
                                                             2), heads=(3, 6, 12, 24), channels=1, head_dim=32,
@@ -225,7 +205,7 @@ class Model1(nn.Module):
         out = self.conv_last(d0)  # 1,256,256
         return out
 
-
+# original ResNet first part + mixed DCNN_CNN part
 class Model2(nn.Module):
     def __init__(self, hidden_dim=64, channels=1):
         super(Model2, self).__init__()

@@ -45,27 +45,6 @@ class Decoder(nn.Module):
         x1 = self.conv_relu(x1)
         return x1
 
-class Decoder_new(nn.Module):
-    def __init__(self, in_channels, middle_channels, out_channels, alpha=0.2):
-        super(Decoder_new, self).__init__()
-        self.up = nn.ConvTranspose2d(in_channels, out_channels, kernel_size=2, stride=2)
-        self.conv_relu = nn.Sequential(
-            nn.Conv2d(middle_channels, out_channels, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True)
-        )
-        self.conv_relu1 = nn.Sequential(
-            nn.Conv2d(middle_channels, out_channels, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True)
-        )
-
-    def forward(self, x1, x2, x3):
-        x1 = self.up(x1)
-        x1 = torch.cat((x1, x2), dim=1)
-        x1 = self.conv_relu(x1)
-        x1 = torch.cat((x1, x3), dim=1)
-        x1 = self.conv_relu1(x1)
-        return x1
-
 
 class Channel_wise(nn.Module):
     def __init__(self, in_channels, out_channels, sizes):
@@ -80,6 +59,7 @@ class Channel_wise(nn.Module):
         return self.avg(x)
 
 
+# Totally Dconv 2, 3, 5 
 class DConv_3(nn.Module):
     def __init__(self, channels):
         super().__init__()
@@ -130,7 +110,7 @@ class DConv_5(nn.Module):
         e5 = e5 + e3
         return e5
 
-
+# Double Branch Res_Swin
 class Res_Swin_v2(nn.Module):
     def __init__(self, img_size=512, hidden_dim=64, layers=(2, 2, 6,
                                                             2), heads=(3, 6, 12, 24), channels=1, head_dim=32,

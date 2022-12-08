@@ -3,6 +3,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+
+# Referred from https://github.com/SSinyu/RED-CNN
 class RED_CNN(nn.Module):
     def __init__(self, out_ch=64):
         super(RED_CNN, self).__init__()

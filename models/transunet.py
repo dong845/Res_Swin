@@ -3,7 +3,7 @@ import torch.nn as nn
 from einops import rearrange
 from vit import ViT
 
-
+# Referred from https://github.com/mkara44/transunet_pytorch
 class EncoderBottleneck(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1, base_width=64):
         super().__init__()

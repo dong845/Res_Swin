@@ -1,18 +1,16 @@
-from torch.utils.data import DataLoader, Dataset
 import os
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
+import random
 import torch
-import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from warmup_scheduler import GradualWarmupScheduler
-from skimage.metrics import peak_signal_noise_ratio as psnr
-from skimage.metrics import structural_similarity as ssim
+import albumentations as A
 from glob import glob
 import torch.nn.functional as F
+from albumentations.pytorch import ToTensorV2
+from warmup_scheduler import GradualWarmupScheduler
+from torch.utils.data import DataLoader, Dataset
 from measure import compute_PSNR, compute_SSIM
-import random
+
 from models.transunet import TransUNet
 from models.unet import Unet_34, Unet_50
 from models.res_swin import Res_Swin
@@ -22,6 +20,17 @@ from models.compare_models import Model1, Model2
 from models.red_cnn import RED_CNN
 
 img_size = (512, 512)
+model_dict = {
+    "red_cnn": RED_CNN(),
+    "unet34": Unet_34(),
+    "unet50": Unet_50(),
+    "model1": Model1(),
+    "model2": Model2(),
+    "res_swin_v1": Res_Swin_v1(),
+    "res_swin_v2": Res_Swin_v2(), 
+    "transunet": TransUNet(img_dim=512,in_channels=1,out_channels=128,head_num=4,mlp_dim=512,block_num=8,patch_dim=16,class_num=1),
+    "res_swin": Res_Swin()
+}
 
 def setup_seed(seed):
      torch.manual_seed(seed)
@@ -30,6 +39,17 @@ def setup_seed(seed):
      random.seed(seed)
      # torch.backends.cudnn.deterministic = True
 setup_seed(0)
+
+def statistics(args):
+    path = args.data_path
+    target_path = sorted(glob(os.path.join(path, '*target*.npy')))
+    mx = float("inf")
+    mn = float("-inf")
+    for f in target_path:
+        img = np.load(f)
+        mx = max(mx, np.max(img))
+        mn = min(mn, np.min(img))
+    return mx, mn
 
 class ct_dataset(Dataset):
     def __init__(self, mode, saved_path, test_patient, transform=None):
@@ -61,18 +81,6 @@ class ct_dataset(Dataset):
         label = augmentations["mask"]
         return image, label
 
-model_dict = {
-    "red_cnn": RED_CNN(),
-    "unet34": Unet_34(),
-    "unet50": Unet_50(),
-    "cmodel1": Model1(),
-    "cmodel2": Model2(),
-    "res_swin_v1": Res_Swin_v1(),
-    "res_swin_v2": Res_Swin_v2(), 
-    "transunet": TransUNet(img_dim=512,in_channels=1,out_channels=128,head_num=4,mlp_dim=512,block_num=8,patch_dim=16,class_num=1),
-    "res_swin": Res_Swin()
-}
-
 train_transform = A.Compose([
     A.HorizontalFlip(p=0.5),
     A.VerticalFlip(p=0.5),
@@ -86,19 +94,20 @@ test_transform = A.Compose([
 
 best_psnr = 0
 best_ssim = 0
-
-def test(args, model, epoch, test_dataset):
+def test(args, model, test_dataset, mx, mn):
     global best_psnr
     global best_ssim
-    pkl_save = args.save_path+"/train_files_gl/"+args.model
-    img_save = args.save_path+"/final_save_cts_gl/"+args.model
-    record_save = args.save_path+"/records_gl/"+args.model
     psnrs = []
     ssims = []
     imgs = []
     names = []
-    mx = 0.0049398174
-    mn = -0.0009475628
+    pkl_save = args.save_path+"/train_files_gl/"+args.model
+    img_save = args.save_path+"/final_save_cts_gl/"+args.model
+    record_save = args.save_path+"/records_gl/"+args.model
+    if args.device=="cpu":
+        device = torch.device("cpu")
+    else:
+        device = torch.device("cuda")
     
     model.eval()
     with torch.no_grad():
@@ -133,9 +142,8 @@ def test(args, model, epoch, test_dataset):
     if pt>best_psnr and st>best_ssim:
         best_psnr = pt
         best_ssim = st
-        if epoch<=args.stop_epoch:
-            for i in range(len(names)):
-                np.save(names[i], imgs[i])
+        for i in range(len(names)):
+            np.save(names[i], imgs[i])
         path_file = os.path.join(pkl_save,"weight.pkl")
         torch.save(model.state_dict(), path_file)
     print("best PSNR:", best_psnr)
@@ -147,11 +155,11 @@ def train(args):
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     record_save = args.save_path+"/records_gl/"+args.model
     
+    mx, mn = statistics(args)
     if args.device=="cpu":
         device = torch.device("cpu")
     else:
         device = torch.device("cuda")
-
     batch_size = args.batch_size
     model = model_dict[args.model].to(device)
     
@@ -184,6 +192,6 @@ def train(args):
             with open(record_save+'/loss.txt','a') as f:
                 temp_loss = str(float(losses / len(train_dataset)))
                 f.write(temp_loss+'\n')
-            test(args, model, epoch, test_dataset)
+            test(args, model, test_dataset, mx, mn)
 
 
