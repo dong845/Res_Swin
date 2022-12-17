@@ -2,9 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def img_show(path):
+def img_show(path, label_path):
     gap = 60
+    label_img = np.load(label_path)
+    mx = np.max(label_img)
+    mn = np.min(label_img)
     img = np.load(path)
+    img[img<mn] = mn
+    img[img>mx] = mx
     plt.imshow(img, cmap='gray')
     plt.xticks([])
     plt.yticks([])
