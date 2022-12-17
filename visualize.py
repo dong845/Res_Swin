@@ -2,7 +2,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def img_show(path, label_path):
+def img_show(path):
+    gap = 60
+    img = np.load(path)
+    plt.imshow(img, cmap='gray')
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+    img_small = img[256 - gap:256 + gap, 256 - gap:256 + gap]
+    plt.imshow(img_small, cmap='gray')
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+
+def img_show_res(path, label_path):
     gap = 60
     label_img = np.load(label_path)
     mx = np.max(label_img)
@@ -42,5 +55,5 @@ def draw(args, input_file, target_file):
         res_path = os.path.join(overall_path, target_file)
     img_show(input_path)
     img_show(target_path)
-    img_show(res_path)
+    img_show_res(res_path, target_path)
     
