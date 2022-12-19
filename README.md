@@ -13,6 +13,8 @@ This repository is a master thesis project in Leiden University
 
 - measure.py: Measurement function of PSNR and SSIM (reference)
 
+- visualize.py: Visualization of images gotten from models to see more details and measure the performance.
+
 - Running with default settings:
 ```
 python main.py
