@@ -14,7 +14,7 @@ def argparser():
     parser.add_argument('--save_path', help='save path', type=str, default="/home/s3084361/data/swin_denoise")
     parser.add_argument('--img_path', help='path saving images', type=str, default="/Users/lyudonghang/Downloads/Training_Image_Data/")
     parser.add_argument('--batch_size', help='the batch size', type=int, default=8)
-    parser.add_argument('--model', help='model type', type=str, default="res_swin", choices=["red_cnn", "unet34", "unet50","unet34-swin","unet34-mcnn","res_swin_sg", "res_swin_db","transunet","res_swin_dbm"])
+    parser.add_argument('--model', help='model type', type=str, default="res_swin", choices=["red_cnn", "unet34", "unet50","unet34_swin","unet34_mcnn","res_swin_sg", "res_swin_db","transunet","res_swin_dbm"])
     parser.add_argument('--data_type', help='data type', type=str, default="data2", choices=["data1", "data2", "data3"])
     parser.add_argument('--mode', help='choosing mode', type=str, default="train", choices=["train", "visualize"])
     return parser
