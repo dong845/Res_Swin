@@ -1,15 +1,16 @@
-# Res_Swin: Effective combination of ResNet and Swin Transformer for denoising of CT images
+# Res-Swin: Effective Combination of ResNet and Swin Transformer for LDCT Denoising
 
-This repository is a master thesis project in Leiden University
+This is my master thesis project in the Leiden University
+
 ## Overview
 
-- models folder: Include all the models of experiments, models of Red CNN, TransUNet refer from other repository
+- models folder: Include all the models of experiments, among them, RED-CNN and TransUNet refer from other repositories
 
-- warmup_scheduler folder: Implement warmup schedueler (reference)
+- warmup_scheduler folder: Implement schedueler with warmup period (reference)
 
-- main.py: Implementation file with mutiple setting parameters
+- main.py: File with mutiple setting parameters, and can be used for training with different dataset and visualize saved results
 
-- train.py: Overall training pipline, including creating dataset, train and test.
+- train.py: Overall training pipline, including creating dataset, training process and testing process.
 
 - measure.py: Measurement function of PSNR and SSIM (reference)
 
@@ -25,7 +26,7 @@ The file requirements imports all the required libraries, but there are also som
 ```
 pip install -r requirements.txt
 ```
-Furthermore, there are some main essential libraries for this project:
+Note: There are some main essential settings for this project:
 - CUDA version: 11.6
 - python: 3.7.11
 - torch: 1.10.2
@@ -33,4 +34,5 @@ Furthermore, there are some main essential libraries for this project:
 - cudatoolkit: 11.3.1
 - cudnn: 8.2.1
 - numpy: 1.21.2
+- albumentations: 1.1.0
 - segmentation-models-pytorch
