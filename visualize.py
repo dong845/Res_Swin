@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+# clipped area
 def img_show(path):
     gap = 60
     img = np.load(path)
@@ -15,6 +16,7 @@ def img_show(path):
     plt.yticks([])
     plt.show()
 
+# clip the getting image within value range of label one
 def img_show_res(path, label_path):
     gap = 60
     label_img = np.load(label_path)
