@@ -109,7 +109,7 @@ class DConv_5(nn.Module):
         e5 = e5 + e3
         return e5
 
-# Mix Block with attention mechanism
+# Mix Block
 class MixBlock(nn.Module):
     def __init__(self, c_in):
         super(MixBlock, self).__init__()
@@ -120,10 +120,10 @@ class MixBlock(nn.Module):
         self.global_key = nn.Conv2d(c_in, c_in, (1, 1))
 
         self.softmax = nn.Softmax(dim=-1)
-        self.relu = nn.ReLU()
+        self.relu = nn.ReLU(inplace=True)
 
-        self.global_gamma = nn.Parameter(torch.zeros(1))
-        self.local_gamma = nn.Parameter(torch.zeros(1))
+        self.global_gamma = nn.Parameter(torch.ones(1))
+        self.local_gamma = nn.Parameter(torch.ones(1))
 
         self.local_conv = nn.Conv2d(c_in, c_in, (1, 1), groups=c_in)
         self.local_bn = nn.BatchNorm2d(c_in)
@@ -152,11 +152,12 @@ class MixBlock(nn.Module):
         y_global = x_global + self.global_bn(self.global_conv(att_local))
         return y_local, y_global
 
-class Res_Swin(nn.Module):
-    def __init__(self, img_size=512, hidden_dim=64, layers=(2, 2, 6,
+
+class Res_Swin_DBM(nn.Module):
+    def __init__(self, img_size=512, hidden_dim=64, layers=(2, 2, 18,
                                                             2), heads=(3, 6, 12, 24), channels=1, head_dim=32,
                  window_size=8, downscaling_factors=(2, 2, 2, 2), relative_pos_embedding=True):
-        super(Res_Swin, self).__init__()
+        super(Res_Swin_DBM, self).__init__()
         self.base_model = torchvision.models.resnet34(True)
         self.base_layers = list(self.base_model.children())
 
@@ -232,10 +233,10 @@ class Res_Swin(nn.Module):
         self.decode1 = Decoder(64, 64 + 64, 64)
         self.decode0 = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(64, 32, kernel_size=3, padding=1, bias=False),
-            nn.Conv2d(32, 16, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True)
         )
-        self.conv_last = nn.Conv2d(16, channels, 1)
+        self.conv_last = nn.Conv2d(64, channels, 1)
 
     def forward(self, x):
         e0 = self.layer0(x)
