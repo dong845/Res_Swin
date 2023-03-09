@@ -16,7 +16,7 @@ This is my master thesis project in the Leiden University
 
 - visualize.py: Visualization of images gotten from models to see more details and measure the performance.
 
-- Running with default settings:
+- Running with default settings **(need to change the values of path variables)**:
 ```
 python main.py
 ```
