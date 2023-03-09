@@ -13,10 +13,10 @@ from measure import compute_PSNR, compute_SSIM
 
 from models.transunet import TransUNet
 from models.unet import Unet_34, Unet_50
-from models.res_swin import Res_Swin
-from models.res_swin_v1 import Res_Swin_v1
-from models.res_swin_v2 import Res_Swin_v2
-from models.compare_models import Model1, Model2
+from models.res_swin_dbm import Res_Swin_DBM
+from models.res_swin_sg import Res_Swin_SG
+from models.res_swin_db import Res_Swin_DB
+from models.compare_models import Unet34_Swin, Unet34_MCNN
 from models.red_cnn import RED_CNN
 
 img_size = (512, 512)
@@ -24,12 +24,12 @@ model_dict = {
     "red_cnn": RED_CNN(),
     "unet34": Unet_34(),
     "unet50": Unet_50(),
-    "model1": Model1(),
-    "model2": Model2(),
-    "res_swin_v1": Res_Swin_v1(),
-    "res_swin_v2": Res_Swin_v2(), 
+    "unet34_swin": Unet34_Swin(),
+    "unet34_mcnn": Unet34_MCNN(),
+    "res_swin_sg": Res_Swin_SG(),
+    "res_swin_db": Res_Swin_DB(), 
     "transunet": TransUNet(img_dim=512,in_channels=1,out_channels=128,head_num=4,mlp_dim=512,block_num=8,patch_dim=16,class_num=1),
-    "res_swin": Res_Swin()
+    "res_swin_dbm": Res_Swin_DBM()
 }
 
 def setup_seed(seed):
@@ -51,7 +51,7 @@ def statistics(args):
         mn = min(mn, np.min(img))
     return mx, mn
 
-class ct_dataset(Dataset):
+class CT_Dataset(Dataset):
     def __init__(self, mode, saved_path, test_patient, transform=None):
         assert mode in ['train', 'test'], "mode is 'train' or 'test'"
 
@@ -59,12 +59,12 @@ class ct_dataset(Dataset):
         target_path = sorted(glob(os.path.join(saved_path, '*target*.npy')))
         self.transform = transform
 
-        if mode == 'train':
+        if mode == "train":
             input_ = [f for f in input_path if test_patient not in f]
             target_ = [f for f in target_path if test_patient not in f]
             self.input_ = input_
             self.target_ = target_
-        else: # mode =='test'
+        elif mode == "test":
             input_ = [f for f in input_path if test_patient in f]
             target_ = [f for f in target_path if test_patient in f]
             self.input_ = input_
@@ -150,8 +150,8 @@ def test(args, model, test_dataset, mx, mn):
     print("best SSIM:", best_ssim)
 
 def train(args):
-    train_dataset = ct_dataset("train",saved_path=args.data_path, test_patient="test",transform=train_transform)
-    test_dataset = ct_dataset("test",saved_path=args.data_path, test_patient="test",transform=test_transform)
+    train_dataset = CT_Dataset("train",saved_path=args.data_path, test_patient="test",transform=train_transform)
+    test_dataset = CT_Dataset("test",saved_path=args.data_path, test_patient="test",transform=test_transform)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     record_save = args.save_path+"/records_gl/"+args.model
     
@@ -166,10 +166,9 @@ def train(args):
     model.train()
     nepoch=args.nepoch
     warmup_epochs = args.warmup_epochs
-    optimizer = optim.AdamW(model.parameters(), lr=args.lr,betas=(0.9,0.999),eps=1e-8, weight_decay=args.weight_decay)
+    optimizer = optim.AdamW(model.parameters(), lr=args.lr,betas=(0.9,0.999),eps=1e-8, weight_decay=args.weight_decay).to(device)
 
-    scheduler_cosine = optim.lr_scheduler.CosineAnnealingLR(optimizer,nepoch-warmup_epochs,
-            eta_min=1e-6)
+    scheduler_cosine = optim.lr_scheduler.CosineAnnealingLR(optimizer,nepoch-warmup_epochs,eta_min=1e-6)
     scheduler = GradualWarmupScheduler(optimizer,
             multiplier=1,total_epoch=warmup_epochs,
             after_scheduler=scheduler_cosine)
@@ -177,8 +176,8 @@ def train(args):
     for epoch in range(args.epochs+1):
         losses = 0
         for i, (image, target) in enumerate(train_loader):
-            image = image.cuda()
-            target = target.unsqueeze(1).cuda()
+            image = image.to(device)
+            target = target.unsqueeze(1).to(device)
             pred = model(image)
             loss = F.mse_loss(pred, target)
             losses += loss.item()
