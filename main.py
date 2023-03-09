@@ -4,7 +4,7 @@ from visualize import draw
 
 def argparser():
     parser = argparse.ArgumentParser("Pytorch version of Res-Swin models")
-    parser.add_argument('--epochs', help='the total episodes', type=int, default=11000)  # data 1 can be about 500
+    parser.add_argument('--epochs', help='the total episodes', type=int, default=11000)  # data 1: 500, data 2 & data 3: 11000
     parser.add_argument('--interval', help='time interval for testing', type=int, default=50)
     parser.add_argument('--nepoch', help='the episodes of scheduler', type=int, default=500)  # data 1 & data 2: 500, data 3: 2000
     parser.add_argument('--warmup_epochs', help='warmup epochs', type=int, default=20)
