@@ -46,7 +46,7 @@ class Decoder(nn.Module):
         x1 = self.conv_relu(x1)
         return x1
 
-# auxiliary branch of swin transformer module, conv + layernorm
+# Auxiliary branch of swin transformer module, conv + layernorm
 class Channel_wise(nn.Module):
     def __init__(self, in_channels, out_channels, sizes):
         super().__init__()
@@ -59,7 +59,7 @@ class Channel_wise(nn.Module):
     def forward(self, x):
         return self.avg(x)
 
-# Conv+DConv+Conv
+# MCNN (3 layers)
 class DConv_3(nn.Module):
     def __init__(self, channels, alpha=0.2):
         super().__init__()
@@ -79,7 +79,7 @@ class DConv_3(nn.Module):
         e3 = e3+e1
         return e3
 
-# Conv+Conv
+# Conv*2
 class DConv_2(nn.Module):
     def __init__(self, channels):
         super().__init__()
@@ -92,7 +92,7 @@ class DConv_2(nn.Module):
         e2=e2+x
         return e2
 
-# Conv+Dconv+Conv+Dconv+Conv
+# MCNN (5 layers)
 class DConv_5(nn.Module):
     def __init__(self, channels, alpha=0.2):
         super().__init__()
@@ -122,9 +122,9 @@ class DConv_5(nn.Module):
         e5 = e5+e3
         return e5
 
-# Swin Transformer module + original ResNet second part
+# UNet34-Swin
 class Model1(nn.Module):
-    def __init__(self, img_size=512, hidden_dim=64, layers=(2, 2, 6,
+    def __init__(self, img_size=512, hidden_dim=64, layers=(2, 2, 18,
                                                             2), heads=(3, 6, 12, 24), channels=1, head_dim=32,
                  window_size=8, downscaling_factors=(2, 2, 2, 2), relative_pos_embedding=True):
         super(Model1, self).__init__()
@@ -178,10 +178,10 @@ class Model1(nn.Module):
         self.decode1 = Decoder(64, 64 + 64, 64)
         self.decode0 = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(64, 32, kernel_size=3, padding=1, bias=False),
-            nn.Conv2d(32, 16, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True)
         )
-        self.conv_last = nn.Conv2d(16, channels, 1)
+        self.conv_last = nn.Conv2d(64, channels, 1)
 
     def forward(self, x):
         e0 = self.layer0(x)
@@ -205,7 +205,7 @@ class Model1(nn.Module):
         out = self.conv_last(d0)  # 1,256,256
         return out
 
-# original ResNet first part + mixed DCNN_CNN part
+# UNet34-MCNN
 class Model2(nn.Module):
     def __init__(self, hidden_dim=64, channels=1):
         super(Model2, self).__init__()
@@ -235,10 +235,10 @@ class Model2(nn.Module):
         self.decode1 = Decoder(64, 64 + 64, 64)
         self.decode0 = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(64, 32, kernel_size=3, padding=1, bias=False),
-            nn.Conv2d(32, 16, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True)
         )
-        self.conv_last = nn.Conv2d(16, channels, 1)
+        self.conv_last = nn.Conv2d(64, channels, 1)
 
     def forward(self, x):
         e0 = self.layer0(x)
