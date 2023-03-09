@@ -20,7 +20,6 @@ class Decoder(nn.Module):
 class Unet_34(nn.Module):
     def __init__(self, n_class=1):
         super().__init__()
-
         self.base_model = torchvision.models.resnet34(True)
         self.base_layers = list(self.base_model.children())
         self.layer1 = nn.Sequential(
@@ -37,8 +36,7 @@ class Unet_34(nn.Module):
         self.decode1 = Decoder(64, 64+64, 64)
         self.decode0 = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(64, 32, kernel_size=3, padding=1, bias=False),
-            nn.Conv2d(32, 64, kernel_size=3, padding=1, bias=False)
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
             )
         self.conv_last = nn.Conv2d(64, n_class, 1)
 
@@ -75,10 +73,9 @@ class Unet_50(nn.Module):
         self.decode1 = Decoder(256, 64 + 64, 64)
         self.decode0 = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(64, 32, kernel_size=3, padding=1, bias=False),
-            nn.Conv2d(32, 16, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1)
         )
-        self.conv_last = nn.Conv2d(16, n_class, 1)
+        self.conv_last = nn.Conv2d(64, n_class, 1)
 
     def forward(self, input):
         e1 = self.layer1(input) # 64,128,128
