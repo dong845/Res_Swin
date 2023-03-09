@@ -123,11 +123,11 @@ class DConv_5(nn.Module):
         return e5
 
 # UNet34-Swin
-class Model1(nn.Module):
+class Unet34_Swin(nn.Module):
     def __init__(self, img_size=512, hidden_dim=64, layers=(2, 2, 18,
                                                             2), heads=(3, 6, 12, 24), channels=1, head_dim=32,
                  window_size=8, downscaling_factors=(2, 2, 2, 2), relative_pos_embedding=True):
-        super(Model1, self).__init__()
+        super(Unet34_Swin, self).__init__()
         self.base_model = torchvision.models.resnet34(True)
         self.base_layers = list(self.base_model.children())
         self.layer0 = nn.Sequential(
@@ -206,9 +206,9 @@ class Model1(nn.Module):
         return out
 
 # UNet34-MCNN
-class Model2(nn.Module):
+class Unet34_MCNN(nn.Module):
     def __init__(self, hidden_dim=64, channels=1):
-        super(Model2, self).__init__()
+        super(Unet34_MCNN, self).__init__()
         self.base_model = torchvision.models.resnet34(True)
         self.base_layers = list(self.base_model.children())
         self.layer0 = nn.Sequential(
