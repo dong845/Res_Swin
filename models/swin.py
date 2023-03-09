@@ -224,18 +224,3 @@ class SwinTransformer(nn.Module):
         x = x.mean(dim=[2, 3])
         return self.mlp_head(x)
 
-
-def swin_t(hidden_dim=96, layers=(2, 2, 6, 2), heads=(3, 6, 12, 24), **kwargs):
-    return SwinTransformer(hidden_dim=hidden_dim, layers=layers, heads=heads, **kwargs)
-
-
-def swin_s(hidden_dim=96, layers=(2, 2, 18, 2), heads=(3, 6, 12, 24), **kwargs):
-    return SwinTransformer(hidden_dim=hidden_dim, layers=layers, heads=heads, **kwargs)
-
-
-def swin_b(hidden_dim=128, layers=(2, 2, 18, 2), heads=(4, 8, 16, 32), **kwargs):
-    return SwinTransformer(hidden_dim=hidden_dim, layers=layers, heads=heads, **kwargs)
-
-
-def swin_l(hidden_dim=192, layers=(2, 2, 18, 2), heads=(6, 12, 24, 48), **kwargs):
-    return SwinTransformer(hidden_dim=hidden_dim, layers=layers, heads=heads, **kwargs)
