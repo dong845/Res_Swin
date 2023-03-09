@@ -36,3 +36,9 @@ Note: There are some main essential settings for this project:
 - numpy: 1.21.2
 - albumentations: 1.1.0
 - segmentation-models-pytorch
+
+## Extension
+
+- Replace ResNet by EfficientNet or other more effective CNN models (for better performance)
+- Replace Swin by Swinv2 or other more effective transformer models (for better performance)
+- Used for other similar tasks, like predicting biomass of forest, semantic segmentation (still need trying)
