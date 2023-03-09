@@ -102,7 +102,7 @@ class DConv_5(nn.Module):
         return e5
 
 # Res-Swin-SG
-class Res_Swin_v1(nn.Module):
+class Res_Swin_SG(nn.Module):
     def __init__(self, img_size=512, hidden_dim=64,layers=(2, 2, 18, 2),heads=(3, 6, 12, 24),channels=1,head_dim=32,window_size=8, downscaling_factors=(2, 2, 2, 2),relative_pos_embedding=True):
         super().__init__()
         self.layer0 = nn.Sequential(
@@ -153,7 +153,7 @@ class Res_Swin_v1(nn.Module):
         self.decode1 = Decoder(64, 64+64, 64)
         self.decode0 = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
-            nn.Conv2d(64, 64, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
             nn.ReLU(inplace=True)
         )
         self.conv_last = nn.Conv2d(64, channels, 1)
