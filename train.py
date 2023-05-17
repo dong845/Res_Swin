@@ -43,8 +43,8 @@ setup_seed(0)
 def statistics(args):
     path = args.data_path
     target_path = sorted(glob(os.path.join(path, '*target*.npy')))
-    mx = float("inf")
-    mn = float("-inf")
+    mx = float("-inf")
+    mn = float("inf")
     for f in target_path:
         img = np.load(f)
         mx = max(mx, np.max(img))
